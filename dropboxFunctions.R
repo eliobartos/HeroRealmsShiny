@@ -1,7 +1,9 @@
+outputDir = 'HeroRealmsData'
+
 # Save one row of data as a file to dropbox
 saveData <- function(data) {
   # Create a unique file name
-  fileName <- sprintf("%s_%s.csv", sub(" ", "_", Sys.Date()), digest::digest(data))
+  fileName <- sprintf("%s_%s.csv", gsub(":", "-", sub(" ", "_", Sys.time())), digest::digest(data))
   
   # Write the data to a temporary file locally
   filePath <- file.path(tempdir(), fileName)
