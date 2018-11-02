@@ -1,7 +1,7 @@
 outputDir = 'HeroRealmsData'
 
 # Save one row of data as a file to dropbox
-saveData <- function(data) {
+saveDataToDrop <- function(data) {
   # Create a unique file name
   fileName <- sprintf("%s_%s.csv", gsub(":", "-", sub(" ", "_", Sys.time())), digest::digest(data))
   
@@ -16,7 +16,7 @@ saveData <- function(data) {
 
 
 # Read all files and load them as one data frame
-loadData <- function() {
+loadDataFromDrop <- function() {
   
   # Read all the files into a list
   filesInfo <- drop_dir(outputDir)

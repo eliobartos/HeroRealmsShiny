@@ -1,7 +1,9 @@
 library(shiny)
 library(shinydashboard)
 library(rdrop2)
+library(formattable)
 
+source("mySQLConnect.R")
 source("helperFunctions.R")
 source("dropboxFunctions.R")
 
@@ -22,7 +24,18 @@ ui <- dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = "players",
-        h2("Players")  
+        h2("Players"),
+        fluidRow(
+          column(width = 6,
+                 box(
+                   title = "Players",
+                   status = "primary",
+                   width = NULL,
+                   solidHeader = TRUE,
+                   formattableOutput("overall_players", width = "15%")
+                 )
+          )
+        )
       ),
       tabItem(tabName = "classes",
         h2("Classes")
@@ -107,6 +120,16 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
+  data_all = pool %>% 
+    tbl('hero_realms_data') %>% 
+    as.data.frame()
+  
+  data_players = get_overall(data_all, "name")
+  
+  output$overall_players = renderFormattable({
+    formattable(data_players)
+  })
+  
   # When clicking on Add Game Button
   observeEvent(input$add_game, {
     validate_data(input$p1_name,
@@ -118,6 +141,10 @@ server <- function(input, output) {
     
   })
 }
+
+onStop(function() {
+  poolClose(pool)
+})
 
 # Run the application 
 shinyApp(ui = ui, server = server)
