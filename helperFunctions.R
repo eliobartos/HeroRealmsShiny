@@ -1,3 +1,5 @@
+library(dplyr)
+
 # Function validates data and then writes it on dropbox
 validate_data = function(p1_name, p1_class, p2_name, p2_class, winner, password) {
   
@@ -63,7 +65,7 @@ create_data = function(p1_name, p1_class, p2_name, p2_class, winner) {
   return(data)
 }
 
-library(dplyr)
+
 
 priors = list()
 priors$overall$alpha = 10
@@ -71,6 +73,7 @@ priors$overall$beta = 10
 
 
 get_overall = function(data_all, group_var = "name") {
+  
   overall_data = data_all %>% 
     group_by_(group_var) %>% 
     summarise(played = n(),
@@ -87,13 +90,25 @@ get_overall = function(data_all, group_var = "name") {
   }
   samples = data.frame(samples)
   samples$max = apply(samples, 1, which.max)
-  
+
   res = samples %>% 
     group_by(max) %>% 
     summarise(n = n()) %>% 
     mutate(prob = n/sum(n))
   
   overall_data$prob_best = res$prob  
+  
+  if(group_var == 'name') {
+    overall_data = overall_data %>% 
+      select(name, played, win, win_rate, bayes_win_rate, prob_best)
+    
+    colnames(overall_data) = c("Name", "Played", "Won", "Win Rate", "Bayes Win Rate", "Is Best %")  
+  } else {
+    overall_data = overall_data %>% 
+      select(class, played, win, win_rate, bayes_win_rate, prob_best)
+    
+    colnames(overall_data) = c("Class", "Played", "Won", "Win Rate", "Bayes Win Rate", "Is Best %")  
+  }
   
   return(overall_data)
 }

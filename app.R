@@ -3,9 +3,9 @@ library(shinydashboard)
 library(rdrop2)
 library(formattable)
 
-source("mySQLConnect.R")
+source("formatTables.R")
 source("helperFunctions.R")
-source("dropboxFunctions.R")
+#source("dropboxFunctions.R")
 
 # Define possible players
 players_names = c('Stasa', 'Kata', 'Elio', 'Tata')
@@ -16,23 +16,38 @@ ui <- dashboardPage(
   dashboardHeader(title = "Hero Realms"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Players", tabName = "players", icon = icon("user-o")),
+      menuItem("Overall", tabName = "overall", icon = icon("user-o")),
       menuItem("Classes", tabName = "classes", icon = icon("superpowers")),
       menuItem("Enter New Game", tabName = "input", icon = icon("pencil-square-o"))
     )
   ),
   dashboardBody(
     tabItems(
-      tabItem(tabName = "players",
-        h2("Players"),
+      tabItem(tabName = "overall",
+        h2("Overall"),
+        br(),
+        br(),
         fluidRow(
-          column(width = 6,
+          column(width = 5,
                  box(
                    title = "Players",
                    status = "primary",
                    width = NULL,
                    solidHeader = TRUE,
-                   formattableOutput("overall_players", width = "15%")
+                   div(style = 'overflow-x: hidden', 
+                       formattableOutput("overall_players")
+                   )
+                 )
+          ),
+          column(width = 5,
+                 box(
+                   title = "Classes",
+                   status = "primary",
+                   width = NULL,
+                   solidHeader = TRUE,
+                   div(style = 'overflow-x: hidden', 
+                       formattableOutput("overall_classes")
+                   )
                  )
           )
         )
@@ -119,17 +134,32 @@ ui <- dashboardPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+  # Connect to database
+  source("mySQLConnect.R")
+  
+  # Closing connection
+  onStop(function() {
+    poolClose(pool)
+  })
   
   data_all = pool %>% 
     tbl('hero_realms_data') %>% 
     as.data.frame()
   
+  
+  # Overall Tab -------------------------------------------------------------
   data_players = get_overall(data_all, "name")
+  data_classes = get_overall(data_all, "class")
   
   output$overall_players = renderFormattable({
-    formattable(data_players)
+    format_overall_data(data_players)
   })
   
+  output$overall_classes = renderFormattable({
+    format_overall_data(data_classes)
+  })
+  
+  # Enter New Game Tab ------------------------------------------------------
   # When clicking on Add Game Button
   observeEvent(input$add_game, {
     validate_data(input$p1_name,
@@ -142,9 +172,10 @@ server <- function(input, output) {
   })
 }
 
-onStop(function() {
-  poolClose(pool)
-})
+
+
+
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
