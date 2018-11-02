@@ -16,8 +16,9 @@ ui <- dashboardPage(
   dashboardHeader(title = "Hero Realms"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Overall", tabName = "overall", icon = icon("user-o")),
-      menuItem("Classes", tabName = "classes", icon = icon("superpowers")),
+      menuItem("Overall", tabName = "overall", icon = icon("globe")),
+      menuItem("Player", tabName = "player", icon = icon("user-o")),
+      menuItem("Compare", tabName = "compare", icon = icon("superpowers")),
       menuItem("Enter New Game", tabName = "input", icon = icon("pencil-square-o"))
     )
   ),
@@ -52,8 +53,11 @@ ui <- dashboardPage(
           )
         )
       ),
-      tabItem(tabName = "classes",
-        h2("Classes")
+      tabItem(tabName = "player",
+        h2("Player")
+      ),
+      tabItem(tabName = "compare",
+        h2("compare")
       ),
       tabItem(tabName = "input",
         h2("Enter New Game"),
