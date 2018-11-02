@@ -7,6 +7,14 @@ source("formatTables.R")
 source("helperFunctions.R")
 #source("dropboxFunctions.R")
 
+# Connect to database
+source("mySQLConnect.R")
+
+# Closing connection
+onStop(function() {
+  poolClose(pool)
+})
+
 # Define possible players
 players_names = c('Stasa', 'Kata', 'Elio', 'Tata')
 classes_names = c('Fighter', 'Wizard', 'Ranger', 'Cleric', 'Thief')
@@ -138,14 +146,7 @@ ui <- dashboardPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  # Connect to database
-  source("mySQLConnect.R")
-  
-  # Closing connection
-  onStop(function() {
-    poolClose(pool)
-  })
-  
+
   data_all = pool %>% 
     tbl('hero_realms_data') %>% 
     as.data.frame()
