@@ -1,10 +1,18 @@
 
+format_compare_data = function(data) {
+  formattable(data, 
+              align = c('l', 'r', 'r', 'c', 'c', 'c'),
+              list(`Win Rate` = percent,
+                   `Bayes Win Rate` =my_color_tile("transparent", "coral"),
+                   `Played` = color_bar("orange"))
+  )
+}
 
 format_overall_data = function(data) {
   formattable(data, 
               align = c('l', 'r', 'r', 'c', 'c', 'c'),
-              list(`Win Rate` = my_color_tile("transparent", "coral"),
-                   `Bayes Win Rate` = percent,
+              list(`Win Rate` = percent,
+                   `Bayes Win Rate` = my_color_tile("transparent", "coral"),
                    `Is Best %` = my_color_tile("transparent", "skyblue"),
                    `Played` = color_bar("orange"))
   )

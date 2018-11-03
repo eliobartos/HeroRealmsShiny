@@ -27,7 +27,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Overall", tabName = "overall", icon = icon("globe")),
-      menuItem("Player", tabName = "player", icon = icon("user-o")),
+      #menuItem("Player", tabName = "player", icon = icon("user-o")),
       menuItem("Compare", tabName = "compare", icon = icon("superpowers")),
       menuItem("Enter New Game", tabName = "input", icon = icon("pencil-square-o"))
     )
@@ -62,9 +62,6 @@ ui <- dashboardPage(
                  )
           )
         )
-      ),
-      tabItem(tabName = "player",
-        h2("Player")
       ),
       tabItem(tabName = "compare", # ---------------------------------------------------------------
         h2("Compare"),
@@ -111,10 +108,38 @@ ui <- dashboardPage(
           column(width = 10,
             fluidRow(valueBoxOutput("matches_played", width = 3),
                      infoBoxOutput("wins", width = 3),
-                     valueBoxOutput("top_pick", width = 3)),
-            fluidRow(h2("Row2")),
-            fluidRow(h2("Row3")),
-            fluidRow(h2("Row4"))
+                     valueBoxOutput("top_pick", width = 3)
+                     ),
+            fluidRow(
+              column(width = 5,
+                box(
+                  title = "Player Classes",
+                  status = "primary",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  div(style = 'overflow-x: hidden', 
+                      formattableOutput("compare_my_classes"))
+                )
+              ),
+              column(width = 5,
+                box(
+                  title = "VS Players",
+                  status = "primary",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  div(style = 'overflow-x: hidden', 
+                      formattableOutput("compare_vs_players"))
+                ),
+                box(
+                  title = "VS Classes",
+                  status = "primary",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  div(style = 'overflow-x: hidden', 
+                      formattableOutput("compare_vs_classes"))
+                )
+              )
+            )
           )
         )
       ),
@@ -220,6 +245,12 @@ server <- function(input, output) {
       filter(name == input$comp_p1_name)
   })
   
+  compare_data = reactive({
+    get_match_data_for_player(data_all, input$comp_p1_name, input$comp_p1_class) %>% 
+      filter_vs(setdiff(input$players_filter, input$comp_p1_name), input$class_filter)
+  })
+  
+  # Value Boxes
   output$matches_played <- renderValueBox({
     valueBox(
       nrow(one_player_data()), "Games Played", icon = icon("play"),
@@ -239,12 +270,31 @@ server <- function(input, output) {
   
   output$top_pick <- renderValueBox({
     valueBox(
-      names(sort(table(one_player_data()[['class']]), decreasing = TRUE))[[1]],
+      get_top_pick(one_player_data()),
       "Top Pick", icon = icon("lisfaet"),
       color = "black",
       width = NULL
     )
   })
+  
+  output$compare_my_classes = renderFormattable({
+    compare_data() %>% 
+      get_compare_table(input$comp_p1_name, "my_class") %>% 
+      format_compare_data()
+  })
+  
+  output$compare_vs_players = renderFormattable({
+    compare_data() %>% 
+      get_compare_table(input$comp_p1_name, "vs_players") %>% 
+      format_compare_data()
+  })
+  
+  output$compare_vs_classes = renderFormattable({
+    compare_data() %>% 
+      get_compare_table(input$comp_p1_name, "vs_classes") %>% 
+      format_compare_data()
+  })
+  
   # Enter New Game Tab ------------------------------------------------------
   # When clicking on Add Game Button
   observeEvent(input$add_game, {

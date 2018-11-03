@@ -82,6 +82,24 @@ get_compare_table = function(data, player, type = "my_class") {
     
     colnames(out) = c("Class", "Played", "Won", "Win Rate", "Bayes Win Rate")  
   }
+  out = out %>% 
+    arrange(desc(`Bayes Win Rate`))
   return(out)
 }
 
+
+get_top_pick = function(data) {
+  out = data %>% 
+    group_by(class) %>% 
+    summarise(played = n(),
+              won = sum(winner)) %>% 
+    arrange(desc(played), desc(won)) %>% 
+    select(class) %>% 
+    unlist()
+  
+  if(length(out) >= 1) {
+    return(out[[1]])
+  } else {
+    return(NULL)
+  }
+}
