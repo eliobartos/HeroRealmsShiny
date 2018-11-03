@@ -2,7 +2,9 @@ library(shiny)
 library(shinydashboard)
 library(rdrop2)
 library(formattable)
+library(dplyr)
 
+source("compare.R")
 source("formatTables.R")
 source("helperFunctions.R")
 #source("dropboxFunctions.R")
@@ -32,7 +34,7 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     tabItems(
-      tabItem(tabName = "overall",
+      tabItem(tabName = "overall", # -------------------------------------------------------
         h2("Overall"),
         br(),
         br(),
@@ -64,10 +66,59 @@ ui <- dashboardPage(
       tabItem(tabName = "player",
         h2("Player")
       ),
-      tabItem(tabName = "compare",
-        h2("compare")
+      tabItem(tabName = "compare", # ---------------------------------------------------------------
+        h2("Compare"),
+        br(),
+        fluidRow(
+          column(
+            width = 2,
+            box(
+              title = "Player 1",
+              status = "primary",
+              width = NULL,
+              solidHeader = TRUE,
+              
+              selectInput(
+                'comp_p1_name', 'Name:', choices = players_names
+              ),
+              selectInput(
+                'comp_p1_class', 'Class:', choices = c("All", classes_names)
+              ),
+              
+              tags$div(
+              checkboxGroupInput("players_filter", 
+                                 h3("VS Players"), 
+                                 choices = list("Stasa" = "Stasa", 
+                                                "Kata" = "Kata", 
+                                                "Elio" = "Elio",
+                                                "Tata" = "Tata"),
+                                 selected = players_names),
+              style="padding-left: 1vw; padding-right: 1vw"
+              ),
+              tags$div(
+              checkboxGroupInput("class_filter", 
+                                 h3("VS Classes"), 
+                                 choices = list("Fighter" = "Fighter", 
+                                                "Wizard" = "Wizard", 
+                                                "Ranger" = "Ranger",
+                                                "Cleric" = "Cleric",
+                                                "Thief" = "Thief"),
+                                 selected = classes_names),
+              style="padding-left: 1vw; padding-right: 1vw"
+              )
+            )
+          ),
+          column(width = 10,
+            fluidRow(valueBoxOutput("matches_played", width = 3),
+                     infoBoxOutput("wins", width = 3),
+                     valueBoxOutput("top_pick", width = 3)),
+            fluidRow(h2("Row2")),
+            fluidRow(h2("Row3")),
+            fluidRow(h2("Row4"))
+          )
+        )
       ),
-      tabItem(tabName = "input",
+      tabItem(tabName = "input", # ----------------------------------------------
         h2("Enter New Game"),
         br(),
         br(),
@@ -151,7 +202,6 @@ server <- function(input, output) {
     tbl('hero_realms_data') %>% 
     as.data.frame()
   
-  
   # Overall Tab -------------------------------------------------------------
   data_players = get_overall(data_all, "name")
   data_classes = get_overall(data_all, "class")
@@ -164,6 +214,37 @@ server <- function(input, output) {
     format_overall_data(data_classes)
   })
   
+  # Compare Tab ------------------------------------------------------
+  one_player_data = reactive({
+    get_match_data_for_player(data_all, input$comp_p1_name, 'All') %>% 
+      filter(name == input$comp_p1_name)
+  })
+  
+  output$matches_played <- renderValueBox({
+    valueBox(
+      nrow(one_player_data()), "Games Played", icon = icon("play"),
+      color = "orange",
+      width = NULL
+    )
+  })
+  
+  output$wins <- renderValueBox({
+    valueBox(
+      sum(one_player_data()[['winner']]), "Wins", 
+      icon = icon("trophy"),
+      color = "aqua",
+      width = NULL
+    )
+  })
+  
+  output$top_pick <- renderValueBox({
+    valueBox(
+      names(sort(table(one_player_data()[['class']]), decreasing = TRUE))[[1]],
+      "Top Pick", icon = icon("lisfaet"),
+      color = "black",
+      width = NULL
+    )
+  })
   # Enter New Game Tab ------------------------------------------------------
   # When clicking on Add Game Button
   observeEvent(input$add_game, {

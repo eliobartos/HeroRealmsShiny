@@ -1,5 +1,5 @@
 library(dplyr)
-
+source("priors.R")
 # Function validates data and then writes it on dropbox
 validate_data = function(p1_name, p1_class, p2_name, p2_class, winner, password) {
   
@@ -65,13 +65,6 @@ create_data = function(p1_name, p1_class, p2_name, p2_class, winner) {
   return(data)
 }
 
-
-
-priors = list()
-priors$overall$alpha = 10
-priors$overall$beta = 10
-
-
 get_overall = function(data_all, group_var = "name") {
   
   overall_data = data_all %>% 
@@ -112,5 +105,7 @@ get_overall = function(data_all, group_var = "name") {
   
   return(overall_data)
 }
+
+
 
 
