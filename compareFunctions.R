@@ -1,5 +1,6 @@
 library(dplyr)
 source("priors.R")
+
 #For players returns IDs of matches played with specific classes
 get_ids = function(data, players, classes = 'All') {
   
@@ -29,7 +30,7 @@ filter_vs = function(data, vs_players, vs_classes) {
     filter(id %in% get_ids(data, vs_players, vs_classes))
 }
 
-# Filter data for specific player and classes and then get this
+# Filter data for specific player and classes and then get table
 # type = c("my class", "vs_players", "vs_classes")
 get_compare_table = function(data, player, type = "my_class") {
   
@@ -87,7 +88,7 @@ get_compare_table = function(data, player, type = "my_class") {
   return(out)
 }
 
-
+# Calculate most used character. If there is a tie, select one with most wins
 get_top_pick = function(data) {
   out = data %>% 
     group_by(class) %>% 

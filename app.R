@@ -1,13 +1,11 @@
 library(shiny)
 library(shinydashboard)
-library(rdrop2)
 library(formattable)
 library(dplyr)
 
-source("compare.R")
+source("compareFunctions.R")
 source("formatTables.R")
-source("helperFunctions.R")
-#source("dropboxFunctions.R")
+source("overviewFunctions.R")
 
 # Connect to database
 source("mySQLConnect.R")

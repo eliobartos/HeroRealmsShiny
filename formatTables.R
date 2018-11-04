@@ -1,4 +1,4 @@
-
+# Format tables on compare tab
 format_compare_data = function(data) {
   formattable(data, 
               align = c('l', 'r', 'r', 'c', 'c', 'c'),
@@ -8,6 +8,7 @@ format_compare_data = function(data) {
   )
 }
 
+# Format tables on overview tab
 format_overall_data = function(data) {
   formattable(data, 
               align = c('l', 'r', 'r', 'c', 'c', 'c'),
@@ -18,6 +19,8 @@ format_overall_data = function(data) {
   )
 }
 
+
+# Custom formatting functons ----------------------------------------------
 
 # Colorbar with percentage
 my_colorbar <- function(color = "lightgray", fun = "comma", digits = 0) {
@@ -34,7 +37,7 @@ my_colorbar <- function(color = "lightgray", fun = "comma", digits = 0) {
   )
 }
 
-# Color tile with percentages
+# Color tile with percentage
 my_color_tile = function(...) {
   formatter("span", x ~ percent(x, digits = 2), 
             style = function(x) style(display = "block",
