@@ -228,26 +228,26 @@ server <- function(input, output) {
   # Overall Tab -------------------------------------------------------------
   data_players = get_overall(data_all, "name")
   data_classes = get_overall(data_all, "class")
-  
+
   output$overall_players = renderFormattable({
     format_overall_data(data_players)
   })
-  
+
   output$overall_classes = renderFormattable({
     format_overall_data(data_classes)
   })
-  
+
   # Compare Tab ------------------------------------------------------
   one_player_data = reactive({
-    get_match_data_for_player(data_all, input$comp_p1_name, 'All') %>% 
+    get_match_data_for_player(data_all, input$comp_p1_name, 'All') %>%
       filter(name == input$comp_p1_name)
   })
-  
+
   compare_data = reactive({
-    get_match_data_for_player(data_all, input$comp_p1_name, input$comp_p1_class) %>% 
+    get_match_data_for_player(data_all, input$comp_p1_name, input$comp_p1_class) %>%
       filter_vs(setdiff(input$players_filter, input$comp_p1_name), input$class_filter)
   })
-  
+
   # Value Boxes
   output$matches_played <- renderValueBox({
     valueBox(
@@ -256,16 +256,16 @@ server <- function(input, output) {
       width = NULL
     )
   })
-  
+
   output$wins <- renderValueBox({
     valueBox(
-      sum(one_player_data()[['winner']]), "Wins", 
+      sum(one_player_data()[['winner']]), "Wins",
       icon = icon("trophy"),
       color = "aqua",
       width = NULL
     )
   })
-  
+
   output$top_pick <- renderValueBox({
     valueBox(
       get_top_pick(one_player_data()),
@@ -274,22 +274,22 @@ server <- function(input, output) {
       width = NULL
     )
   })
-  
+
   output$compare_my_classes = renderFormattable({
-    compare_data() %>% 
-      get_compare_table(input$comp_p1_name, "my_class") %>% 
+    compare_data() %>%
+      get_compare_table(input$comp_p1_name, "my_class") %>%
       format_compare_data()
   })
-  
+
   output$compare_vs_players = renderFormattable({
-    compare_data() %>% 
-      get_compare_table(input$comp_p1_name, "vs_players") %>% 
+    compare_data() %>%
+      get_compare_table(input$comp_p1_name, "vs_players") %>%
       format_compare_data()
   })
-  
+
   output$compare_vs_classes = renderFormattable({
-    compare_data() %>% 
-      get_compare_table(input$comp_p1_name, "vs_classes") %>% 
+    compare_data() %>%
+      get_compare_table(input$comp_p1_name, "vs_classes") %>%
       format_compare_data()
   })
   
